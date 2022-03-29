@@ -1,5 +1,0 @@
-python-dotenv
-fastapi
-uvicorn
-pydantic
-tensorflow==2.8
