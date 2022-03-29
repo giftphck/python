@@ -1,37 +1,26 @@
-import tensorflow as tf
-load_model = tf.keras.models.load_model
-
+from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
-import numpy as np
 
 app = FastAPI()
 
-class Data(BaseModel):
-    x:float
-    y:float
 
-def loadModel():
-    global predict_model
+class Item(BaseModel):
+    name: str
+    price: float
+    is_offer: Optional[bool] = None
 
-    predict_model = load_model('model1.h5')
 
-loadModel()
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
 
-async def predict(data):
-    classNameCat = {0:'class_A', 1:'class_B', 2:'class_C'}
-    X = np.array([[data.x, data.y]])
 
-    pred = predict_model.predict(X)
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: Optional[str] = None):
+    return {"item_id": item_id, "q": q}
 
-    res = np.argmax(pred, axis=1)[0]
-    category = classNameCat[res]
-    confidence = float(pred[0][res])
-        
-    return category, confidence
 
-@app.post('/getclass/')
-async def get_class(data: Data):
-    category, confidence = await predict(data)
-    res = {'class': category, 'confidence':confidence}
-    return {'results': res}
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item):
+    return {"item_name": item.name, "item_id": item_id}
